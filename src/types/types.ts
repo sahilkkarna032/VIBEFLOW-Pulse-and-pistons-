@@ -70,6 +70,13 @@ export interface UserLikedTrack {
   created_at: string;
 }
 
+export interface UserLikedPlaylist {
+  id: string;
+  user_id: string;
+  playlist_id: string;
+  created_at: string;
+}
+
 export interface RecentlyPlayed {
   id: string;
   user_id: string;

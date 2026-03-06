@@ -14,7 +14,8 @@ A comprehensive, multi-page music streaming application featuring an adaptive fo
 Implement a 5-Tab Bottom Navigation Bar with the following sections:
 
 **Home Tab**
-- Display Adaptive Engine slider for focus score adjustment
+- Display Adaptive Engine slider (Relaxation Level Bar) at the top for focus score adjustment (0-100)
+- The app dynamically changes playlists based on the relaxation level set by the user on this bar
 - Show Recently Played section with horizontal scrolling
 - Display Current Focus Mode status indicator
 - Show personalized recommendations based on listening history
@@ -22,6 +23,7 @@ Implement a 5-Tab Bottom Navigation Bar with the following sections:
 - Show Made For You playlists
 - Display an expanded set of relaxation music playlists for the user to choose from
 - Each song displayed on the home page includes a like button (heart icon) for users to like individual songs
+- Each playlist displayed on the home page includes a like button (heart icon) for users to like playlists
 - Quick Start Sessions section with View All button that expands to show additional sessions featuring a variety of relaxation music
 
 **Discover Tab**
@@ -42,6 +44,7 @@ Implement a 5-Tab Bottom Navigation Bar with the following sections:
 **My Library Tab**
 - Vertical list displaying:
   - Liked Songs
+  - Liked Playlists
   - Downloaded Albums
   - Custom Focus Profiles
   - Your Playlists
@@ -106,7 +109,9 @@ Manage global state FocusScore (Integer, 0-100) with three focus zones:
 
 ### 2.4 Library Management
 - Heart icon on every track for liking
+- Heart icon on every playlist for liking
 - Real-time addition of track_id to user Liked Songs list upon clicking
+- Real-time addition of playlist_id to user Liked Playlists list upon clicking
 - Create, edit, and delete custom playlists
 - Add tracks to multiple playlists
 - Playlist cover customization
@@ -184,6 +189,7 @@ Manage global state FocusScore (Integer, 0-100) with three focus zones:
 - followers: Array of user IDs
 - created_playlists: Array of playlist IDs
 - liked_songs: Array of track IDs
+- liked_playlists: Array of playlist IDs
 - downloaded_content: Array of content IDs
 - listening_history: Array of track play records
 

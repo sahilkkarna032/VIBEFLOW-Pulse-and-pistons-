@@ -1,5 +1,5 @@
 import { supabase } from './supabase';
-import type { Track, Playlist, User, UserLikedTrack, FocusHistory, Artist, Album, RecentlyPlayed } from '@/types';
+import type { Track, Playlist, User, UserLikedTrack, UserLikedPlaylist, FocusHistory, Artist, Album, RecentlyPlayed } from '@/types';
 
 // Tracks
 export async function getAllTracks(): Promise<Track[]> {
@@ -230,6 +230,57 @@ export async function removeTrackFromPlaylist(playlistId: string, trackId: strin
 
   const updatedTrackIds = playlist.track_ids.filter(id => id !== trackId);
   await updatePlaylist(playlistId, { track_ids: updatedTrackIds });
+}
+
+// User Liked Playlists
+export async function addLikedPlaylist(userId: string, playlistId: string): Promise<void> {
+  const { error } = await supabase
+    .from('user_liked_playlists')
+    .insert({ user_id: userId, playlist_id: playlistId });
+
+  if (error) throw error;
+}
+
+export async function removeLikedPlaylist(userId: string, playlistId: string): Promise<void> {
+  const { error } = await supabase
+    .from('user_liked_playlists')
+    .delete()
+    .eq('user_id', userId)
+    .eq('playlist_id', playlistId);
+
+  if (error) throw error;
+}
+
+export async function isPlaylistLiked(userId: string, playlistId: string): Promise<boolean> {
+  const { data, error } = await supabase
+    .from('user_liked_playlists')
+    .select('id')
+    .eq('user_id', userId)
+    .eq('playlist_id', playlistId)
+    .maybeSingle();
+
+  if (error) return false;
+  return !!data;
+}
+
+export async function getLikedPlaylists(userId: string): Promise<Playlist[]> {
+  const { data: likedData, error: likedError } = await supabase
+    .from('user_liked_playlists')
+    .select('playlist_id')
+    .eq('user_id', userId);
+
+  if (likedError || !likedData) return [];
+
+  const playlistIds = likedData.map(item => item.playlist_id);
+  if (playlistIds.length === 0) return [];
+
+  const { data: playlists, error: playlistsError } = await supabase
+    .from('playlists')
+    .select('*')
+    .in('id', playlistIds);
+
+  if (playlistsError) return [];
+  return Array.isArray(playlists) ? playlists : [];
 }
 
 // Focus History

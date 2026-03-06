@@ -2,14 +2,17 @@ import { useEffect, useState } from 'react';
 import { TrackCard } from '@/components/TrackCard';
 import { SessionCard } from '@/components/SessionCard';
 import { IntensityMeter } from '@/components/IntensityMeter';
+import { RelaxationMeter } from '@/components/RelaxationMeter';
 import { usePlayer } from '@/contexts/FocusContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Clock, Sparkles, Zap, Brain, Music2 } from 'lucide-react';
-import { getRecentlyPlayed, getTracksByFilter, getCuratedPlaylists } from '@/db/api';
+import { Clock, Sparkles, Zap, Brain, Music2, Heart } from 'lucide-react';
+import { getRecentlyPlayed, getTracksByFilter, getCuratedPlaylists, getAllTracks, isPlaylistLiked, addLikedPlaylist, removeLikedPlaylist } from '@/db/api';
+import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
 import type { Track, Playlist } from '@/types';
 
 export default function HomePage() {
@@ -20,6 +23,8 @@ export default function HomePage() {
   const [relaxationPlaylists, setRelaxationPlaylists] = useState<Playlist[]>([]);
   const [loadingRecent, setLoadingRecent] = useState(false);
   const [loadingRelaxation, setLoadingRelaxation] = useState(false);
+  const [relaxationLevel, setRelaxationLevel] = useState(50);
+  const [likedPlaylists, setLikedPlaylists] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (user) {
@@ -32,13 +37,37 @@ export default function HomePage() {
   }, [user]);
 
   useEffect(() => {
-    // Load relaxation music (BPM < 90, relaxing genres)
+    // Load relaxation music based on relaxation level
     setLoadingRelaxation(true);
+    
+    let bpmMin: number | undefined;
+    let bpmMax: number | undefined;
+    let genres: string[] = ['Acoustic', 'Jazz', 'Classical', 'Ambient'];
+
+    // Adjust filters based on relaxation level
+    if (relaxationLevel <= 30) {
+      // Deep Relaxation: Very slow BPM
+      bpmMin = undefined;
+      bpmMax = 60;
+      genres = ['Ambient', 'Classical'];
+    } else if (relaxationLevel <= 60) {
+      // Moderate Relaxation: Calm BPM
+      bpmMin = 50;
+      bpmMax = 80;
+      genres = ['Acoustic', 'Jazz', 'Classical', 'Ambient'];
+    } else {
+      // Light Relaxation: Gentle energy
+      bpmMin = 70;
+      bpmMax = 100;
+      genres = ['Acoustic', 'Jazz', 'Lo-Fi'];
+    }
+
     Promise.all([
-      getTracksByFilter(undefined, 89, ['Acoustic', 'Jazz', 'Classical', 'Ambient']),
+      getTracksByFilter(bpmMin, bpmMax, genres),
       getCuratedPlaylists(),
     ]).then(([tracks, allPlaylists]) => {
-      setRelaxationTracks(tracks.slice(0, 16)); // Increased from 8 to 16
+      setRelaxationTracks(tracks.slice(0, 16));
+      
       // Filter for relaxation playlists
       const relaxPlaylists = allPlaylists.filter(p => 
         p.title.toLowerCase().includes('relaxation') ||
@@ -53,8 +82,21 @@ export default function HomePage() {
       );
       setRelaxationPlaylists(relaxPlaylists.slice(0, 4));
       setLoadingRelaxation(false);
+
+      // Load liked status for playlists
+      if (user) {
+        Promise.all(
+          relaxPlaylists.slice(0, 4).map(p => isPlaylistLiked(user.id, p.id))
+        ).then(results => {
+          const liked = new Set<string>();
+          relaxPlaylists.slice(0, 4).forEach((p, i) => {
+            if (results[i]) liked.add(p.id);
+          });
+          setLikedPlaylists(liked);
+        });
+      }
     });
-  }, []);
+  }, [relaxationLevel, user]);
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -92,6 +134,33 @@ export default function HomePage() {
       setFocusScore(50);
     } else {
       setFocusScore(85);
+    }
+  };
+
+  const handlePlaylistLike = async (playlistId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!user) {
+      toast.error('Please login to like playlists');
+      return;
+    }
+
+    try {
+      const isLiked = likedPlaylists.has(playlistId);
+      if (isLiked) {
+        await removeLikedPlaylist(user.id, playlistId);
+        setLikedPlaylists(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(playlistId);
+          return newSet;
+        });
+        toast.success('Removed from liked playlists');
+      } else {
+        await addLikedPlaylist(user.id, playlistId);
+        setLikedPlaylists(prev => new Set(prev).add(playlistId));
+        toast.success('Added to liked playlists');
+      }
+    } catch (error) {
+      toast.error('Failed to update liked playlists');
     }
   };
 
@@ -221,6 +290,9 @@ export default function HomePage() {
 
           {/* Right Sidebar */}
           <div className="space-y-6">
+            {/* Relaxation Level Control */}
+            <RelaxationMeter value={relaxationLevel} onChange={setRelaxationLevel} />
+
             {/* Intensity Meter */}
             <IntensityMeter />
 
@@ -311,6 +383,22 @@ export default function HomePage() {
                         <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center">
                           <Sparkles className="w-6 h-6 text-white" />
                         </div>
+                      </div>
+                      {/* Like button for playlist */}
+                      <div className="absolute top-2 right-2 opacity-90 group-hover:opacity-100 focus-transition">
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="w-8 h-8 bg-black/50 hover:bg-black/70 backdrop-blur-sm"
+                          onClick={(e) => handlePlaylistLike(playlist.id, e)}
+                        >
+                          <Heart
+                            className={cn(
+                              'w-4 h-4',
+                              likedPlaylists.has(playlist.id) ? 'fill-primary text-primary' : 'text-white'
+                            )}
+                          />
+                        </Button>
                       </div>
                     </div>
                     <div className="p-4">
