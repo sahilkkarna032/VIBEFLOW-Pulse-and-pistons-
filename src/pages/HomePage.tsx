@@ -9,15 +9,17 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Clock, Sparkles, Zap, Brain, Music2, Heart } from 'lucide-react';
+import { Clock, Sparkles, Zap, Brain, Music2, Heart, Download } from 'lucide-react';
 import { getRecentlyPlayed, getTracksByFilter, getCuratedPlaylists, getAllTracks, isPlaylistLiked, addLikedPlaylist, removeLikedPlaylist } from '@/db/api';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { useNavigate } from 'react-router-dom';
 import type { Track, Playlist } from '@/types';
 
 export default function HomePage() {
   const { focusMode, focusScore, setFocusScore, currentTrack, isPlaying, playTrack } = usePlayer();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [recentTracks, setRecentTracks] = useState<Track[]>([]);
   const [relaxationTracks, setRelaxationTracks] = useState<Track[]>([]);
   const [relaxationPlaylists, setRelaxationPlaylists] = useState<Playlist[]>([]);
@@ -176,8 +178,10 @@ export default function HomePage() {
   const handleModeToggle = (mode: 'adaptive' | 'deep-work') => {
     if (mode === 'adaptive') {
       setFocusScore(50);
+      toast.info('Switched to Adaptive mode');
     } else {
       setFocusScore(85);
+      toast.info('Switched to Deep Work mode');
     }
   };
 
@@ -205,6 +209,31 @@ export default function HomePage() {
       }
     } catch (error) {
       toast.error('Failed to update liked playlists');
+    }
+  };
+
+  const handlePlaylistDownload = async (playlist: Playlist, e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      const playlistData = {
+        title: playlist.title,
+        description: playlist.description,
+        track_count: playlist.track_ids.length,
+        created_at: playlist.created_at,
+      };
+      
+      const blob = new Blob([JSON.stringify(playlistData, null, 2)], { type: 'application/json' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${playlist.title}.json`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      toast.success('Playlist info downloaded');
+    } catch (error) {
+      toast.error('Failed to download playlist');
     }
   };
 
@@ -253,7 +282,7 @@ export default function HomePage() {
                   variant="ghost" 
                   size="sm" 
                   className="text-muted-foreground" 
-                  onClick={() => window.location.href = '/sessions'}
+                  onClick={() => navigate('/sessions')}
                 >
                   View All
                 </Button>
@@ -428,8 +457,8 @@ export default function HomePage() {
                           <Sparkles className="w-6 h-6 text-white" />
                         </div>
                       </div>
-                      {/* Like button for playlist */}
-                      <div className="absolute top-2 right-2 opacity-90 group-hover:opacity-100 focus-transition">
+                      {/* Like and Download buttons for playlist */}
+                      <div className="absolute top-2 right-2 flex gap-1 opacity-90 group-hover:opacity-100 focus-transition">
                         <Button
                           size="icon"
                           variant="ghost"
@@ -442,6 +471,14 @@ export default function HomePage() {
                               likedPlaylists.has(playlist.id) ? 'fill-primary text-primary' : 'text-white'
                             )}
                           />
+                        </Button>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="w-8 h-8 bg-black/50 hover:bg-black/70 backdrop-blur-sm"
+                          onClick={(e) => handlePlaylistDownload(playlist, e)}
+                        >
+                          <Download className="w-4 h-4 text-white" />
                         </Button>
                       </div>
                     </div>

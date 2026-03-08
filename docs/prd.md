@@ -15,6 +15,7 @@ Implement a 5-Tab Bottom Navigation Bar with the following sections:
 
 **Home Tab**
 - Display Adaptive Engine slider (Relaxation Level Bar) at the top for focus score adjustment (0-100) with granular control supporting increments of 1
+- The Adaptive Engine slider must be fully functional with instant response and zero delay
 - The app dynamically changes playlists and songs being played based on the relaxation level set by the user on this bar with instant response and zero delay
 - When user adjusts the relaxation level bar, immediately and automatically switch to appropriate playlist and begin playback based on the current focus zone without any buffering or delay
 - Show Recently Played section with horizontal scrolling
@@ -24,8 +25,10 @@ Implement a 5-Tab Bottom Navigation Bar with the following sections:
 - Show Made For You playlists
 - Display an expanded set of relaxation music playlists for the user to choose from
 - Each song displayed on the home page includes a like button (heart icon) for users to like individual songs
+- Each song displayed on the home page includes a download button for offline listening
 - Each playlist displayed on the home page includes a like button (heart icon) for users to like playlists
-- Quick Start Sessions section with View All button that expands to show additional sessions featuring a variety of relaxation music
+- Each playlist displayed on the home page includes a download button for offline listening
+- Quick Start Sessions section with View All button that must work properly without any delay, expanding to show additional sessions featuring a variety of relaxation music
 
 **Discover Tab**
 - Search bar at the top with voice search capability, allowing users to search from the available relaxation music in the app
@@ -81,6 +84,7 @@ Manage global state FocusScore (Integer, 0-100) with enhanced granular focus zon
 - Hide social features
 - Auto-queue similar high-focus tracks
 - Instantly switch to Ultra Deep Work playlists and begin playback with zero delay when relaxation level is set in this range
+- Deep Work button must be fully functional with instant response
 
 **Deep Work Mode (76-90)**
 - Filter tracks: is_instrumental = true AND BPM 120-130
@@ -88,6 +92,7 @@ Manage global state FocusScore (Integer, 0-100) with enhanced granular focus zon
 - Hide social features
 - Auto-queue similar high-focus tracks
 - Instantly switch to Deep Work playlists and begin playback with zero delay when relaxation level is set in this range
+- Deep Work button must be fully functional with instant response
 
 **High Flow State Mode (61-75)**
 - Filter tracks: BPM 110-120
@@ -131,13 +136,16 @@ Manage global state FocusScore (Integer, 0-100) with enhanced granular focus zon
 - Sleep timer
 - Share currently playing track
 - Add to playlist quick action
+- Download button for currently playing track
 - Artist and album quick navigation
 - Support playback of audio files in various formats
 - Instant playlist switching capability with zero buffering when relaxation level changes
 
 ### 2.4 Library Management
 - Heart icon on every track for liking
+- Download button on every track for offline listening
 - Heart icon on every playlist for liking
+- Download button on every playlist for offline listening
 - Real-time addition of track_id to user Liked Songs list upon clicking
 - Real-time addition of playlist_id to user Liked Playlists list upon clicking
 - Create, edit, and delete custom playlists

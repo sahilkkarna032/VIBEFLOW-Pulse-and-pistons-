@@ -1,4 +1,4 @@
-import { Play, Heart, MoreVertical } from 'lucide-react';
+import { Play, Heart, MoreVertical, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import {
@@ -67,6 +67,32 @@ export function TrackCard({ track, playlist }: TrackCardProps) {
     toast.success('Added to queue');
   };
 
+  const handleDownload = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!track.audio_url) {
+      toast.error('Audio file not available for download');
+      return;
+    }
+
+    try {
+      toast.info('Starting download...');
+      const response = await fetch(track.audio_url);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${track.artist} - ${track.title}.mp3`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      toast.success('Download started');
+    } catch (error) {
+      console.error('Download error:', error);
+      toast.error('Failed to download track');
+    }
+  };
+
   return (
     <Card
       className={cn(
@@ -132,6 +158,10 @@ export function TrackCard({ track, playlist }: TrackCardProps) {
                   </DropdownMenuItem>
                 }
               />
+              <DropdownMenuItem onClick={handleDownload}>
+                <Download className="w-4 h-4 mr-2" />
+                Download
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

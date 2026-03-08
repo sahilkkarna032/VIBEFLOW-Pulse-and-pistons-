@@ -7,7 +7,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getPlaylistById, getTracksByIds, deletePlaylist, updatePlaylist } from '@/db/api';
-import { ArrowLeft, Play, Heart, MoreVertical, Edit, Trash, Plus } from 'lucide-react';
+import { ArrowLeft, Play, Heart, MoreVertical, Edit, Trash, Plus, Download } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import type { Track, Playlist } from '@/types';
@@ -108,6 +108,38 @@ export default function PlaylistDetailPage() {
       navigate('/library');
     } catch (error) {
       toast.error('Failed to delete playlist');
+    }
+  };
+
+  const handleDownload = async () => {
+    if (!playlist) return;
+
+    try {
+      const playlistData = {
+        title: playlist.title,
+        description: playlist.description,
+        track_count: tracks.length,
+        tracks: tracks.map(t => ({
+          title: t.title,
+          artist: t.artist,
+          bpm: t.bpm,
+          genre: t.genre,
+        })),
+        created_at: playlist.created_at,
+      };
+      
+      const blob = new Blob([JSON.stringify(playlistData, null, 2)], { type: 'application/json' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${playlist.title}.json`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      toast.success('Playlist downloaded');
+    } catch (error) {
+      toast.error('Failed to download playlist');
     }
   };
 
@@ -214,6 +246,14 @@ export default function PlaylistDetailPage() {
                 onClick={() => toast.info('Like playlist feature coming soon')}
               >
                 <Heart className="w-5 h-5" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="rounded-full"
+                onClick={handleDownload}
+              >
+                <Download className="w-5 h-5" />
               </Button>
             </div>
           </div>
