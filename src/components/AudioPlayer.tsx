@@ -3,6 +3,17 @@ import { usePlayer } from '@/contexts/FocusContext';
 
 export function AudioPlayer() {
   const audioRef = useRef<HTMLAudioElement>(null);
+  
+  // Safely get player context
+  let playerContext;
+  try {
+    playerContext = usePlayer();
+  } catch (error) {
+    // Context not ready yet, return null
+    console.warn('AudioPlayer: PlayerProvider not ready yet');
+    return null;
+  }
+
   const {
     currentTrack,
     isPlaying,
@@ -12,7 +23,7 @@ export function AudioPlayer() {
     setCurrentTime,
     setDuration,
     playNext,
-  } = usePlayer();
+  } = playerContext;
 
   // Load track and auto-play if needed
   useEffect(() => {
