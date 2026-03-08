@@ -9,9 +9,42 @@ interface RelaxationMeterProps {
 
 export function RelaxationMeter({ value, onChange }: RelaxationMeterProps) {
   const getRelaxationLevel = (score: number) => {
-    if (score <= 30) return { label: 'Deep Relaxation', color: 'text-blue-400', description: 'Meditation & Sleep' };
-    if (score <= 60) return { label: 'Moderate Relaxation', color: 'text-purple-400', description: 'Calm & Peaceful' };
-    return { label: 'Light Relaxation', color: 'text-pink-400', description: 'Gentle Energy' };
+    if (score <= 20) return { 
+      label: 'Deep Sleep', 
+      color: 'text-indigo-400', 
+      description: 'Meditation & Deep Rest',
+      bgColor: 'bg-indigo-500/10'
+    };
+    if (score <= 40) return { 
+      label: 'Deep Relaxation', 
+      color: 'text-blue-400', 
+      description: 'Calm & Soothing',
+      bgColor: 'bg-blue-500/10'
+    };
+    if (score <= 60) return { 
+      label: 'Moderate Relaxation', 
+      color: 'text-cyan-400', 
+      description: 'Balanced & Peaceful',
+      bgColor: 'bg-cyan-500/10'
+    };
+    if (score <= 75) return { 
+      label: 'Light Relaxation', 
+      color: 'text-teal-400', 
+      description: 'Gentle Energy',
+      bgColor: 'bg-teal-500/10'
+    };
+    if (score <= 90) return { 
+      label: 'Active Relaxation', 
+      color: 'text-green-400', 
+      description: 'Uplifting & Positive',
+      bgColor: 'bg-green-500/10'
+    };
+    return { 
+      label: 'Energized', 
+      color: 'text-lime-400', 
+      description: 'Vibrant & Refreshed',
+      bgColor: 'bg-lime-500/10'
+    };
   };
 
   const level = getRelaxationLevel(value);
@@ -43,24 +76,38 @@ export function RelaxationMeter({ value, onChange }: RelaxationMeterProps) {
             className="w-full"
           />
           <div className="flex justify-between text-xs text-muted-foreground">
-            <span>Deep</span>
+            <span>Deep Sleep</span>
             <span className={level.color}>{level.label}</span>
-            <span>Light</span>
+            <span>Energized</span>
           </div>
         </div>
 
         <div className="grid grid-cols-3 gap-2 text-xs">
+          <div className="text-center p-2 rounded bg-indigo-500/10">
+            <p className="font-semibold text-indigo-400">0-20</p>
+            <p className="text-muted-foreground">Deep Sleep</p>
+          </div>
           <div className="text-center p-2 rounded bg-blue-500/10">
-            <p className="font-semibold text-blue-400">0-30</p>
+            <p className="font-semibold text-blue-400">21-40</p>
             <p className="text-muted-foreground">Deep</p>
           </div>
-          <div className="text-center p-2 rounded bg-purple-500/10">
-            <p className="font-semibold text-purple-400">31-60</p>
+          <div className="text-center p-2 rounded bg-cyan-500/10">
+            <p className="font-semibold text-cyan-400">41-60</p>
             <p className="text-muted-foreground">Moderate</p>
           </div>
-          <div className="text-center p-2 rounded bg-pink-500/10">
-            <p className="font-semibold text-pink-400">61-100</p>
+        </div>
+        <div className="grid grid-cols-3 gap-2 text-xs">
+          <div className="text-center p-2 rounded bg-teal-500/10">
+            <p className="font-semibold text-teal-400">61-75</p>
             <p className="text-muted-foreground">Light</p>
+          </div>
+          <div className="text-center p-2 rounded bg-green-500/10">
+            <p className="font-semibold text-green-400">76-90</p>
+            <p className="text-muted-foreground">Active</p>
+          </div>
+          <div className="text-center p-2 rounded bg-lime-500/10">
+            <p className="font-semibold text-lime-400">91-100</p>
+            <p className="text-muted-foreground">Energized</p>
           </div>
         </div>
       </div>

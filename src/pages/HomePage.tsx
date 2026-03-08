@@ -44,22 +44,37 @@ export default function HomePage() {
     let bpmMax: number | undefined;
     let genres: string[] = ['Acoustic', 'Jazz', 'Classical', 'Ambient'];
 
-    // Adjust filters based on relaxation level
-    if (relaxationLevel <= 30) {
-      // Deep Relaxation: Very slow BPM
+    // Adjust filters based on relaxation level with 6 levels
+    if (relaxationLevel <= 20) {
+      // Deep Sleep: Very slow BPM for meditation and deep rest
       bpmMin = undefined;
-      bpmMax = 60;
+      bpmMax = 50;
       genres = ['Ambient', 'Classical'];
+    } else if (relaxationLevel <= 40) {
+      // Deep Relaxation: Slow, calming
+      bpmMin = 45;
+      bpmMax = 65;
+      genres = ['Ambient', 'Classical', 'Acoustic'];
     } else if (relaxationLevel <= 60) {
-      // Moderate Relaxation: Calm BPM
-      bpmMin = 50;
+      // Moderate Relaxation: Balanced, peaceful
+      bpmMin = 60;
       bpmMax = 80;
       genres = ['Acoustic', 'Jazz', 'Classical', 'Ambient'];
-    } else {
+    } else if (relaxationLevel <= 75) {
       // Light Relaxation: Gentle energy
-      bpmMin = 70;
-      bpmMax = 100;
+      bpmMin = 75;
+      bpmMax = 95;
       genres = ['Acoustic', 'Jazz', 'Lo-Fi'];
+    } else if (relaxationLevel <= 90) {
+      // Active Relaxation: Uplifting
+      bpmMin = 90;
+      bpmMax = 110;
+      genres = ['Lo-Fi', 'Jazz', 'Acoustic'];
+    } else {
+      // Energized: Vibrant and refreshed
+      bpmMin = 105;
+      bpmMax = 125;
+      genres = ['Lo-Fi', 'Electronic', 'Jazz'];
     }
 
     Promise.all([
@@ -96,40 +111,36 @@ export default function HomePage() {
           setLikedPlaylists(liked);
         });
       }
-    });
-  }, [relaxationLevel, user]);
 
-  // Auto-play when relaxation level changes significantly
-  useEffect(() => {
-    // Only auto-play if there are tracks and user has interacted with the slider
-    if (relaxationTracks.length > 0 && currentTrack) {
-      // Check if current track BPM matches the new relaxation level
-      const currentBpm = currentTrack.bpm;
-      let shouldChange = false;
-
-      if (relaxationLevel <= 30 && currentBpm > 60) {
-        shouldChange = true;
-      } else if (relaxationLevel > 30 && relaxationLevel <= 60 && (currentBpm < 50 || currentBpm > 80)) {
-        shouldChange = true;
-      } else if (relaxationLevel > 60 && (currentBpm < 70 || currentBpm > 100)) {
-        shouldChange = true;
-      }
-
-      if (shouldChange && isPlaying) {
-        // Auto-switch to appropriate track
-        const suitableTrack = relaxationTracks.find(track => {
-          if (relaxationLevel <= 30) return track.bpm <= 60;
-          if (relaxationLevel <= 60) return track.bpm >= 50 && track.bpm <= 80;
-          return track.bpm >= 70 && track.bpm <= 100;
+      // Auto-play immediately when relaxation level changes
+      if (filteredTracks.length > 0) {
+        // Find the best matching track for the new level
+        const suitableTrack = filteredTracks.find(track => {
+          if (relaxationLevel <= 20) return track.bpm <= 50;
+          if (relaxationLevel <= 40) return track.bpm >= 45 && track.bpm <= 65;
+          if (relaxationLevel <= 60) return track.bpm >= 60 && track.bpm <= 80;
+          if (relaxationLevel <= 75) return track.bpm >= 75 && track.bpm <= 95;
+          if (relaxationLevel <= 90) return track.bpm >= 90 && track.bpm <= 110;
+          return track.bpm >= 105 && track.bpm <= 125;
         });
 
+        // Auto-switch immediately if we have a suitable track
         if (suitableTrack) {
-          playTrack(suitableTrack, relaxationTracks);
-          toast.info(`Switched to ${relaxationLevel <= 30 ? 'Deep' : relaxationLevel <= 60 ? 'Moderate' : 'Light'} Relaxation music`);
+          playTrack(suitableTrack, filteredTracks);
+          
+          // Show appropriate message based on level
+          let levelName = 'Deep Sleep';
+          if (relaxationLevel > 20 && relaxationLevel <= 40) levelName = 'Deep Relaxation';
+          else if (relaxationLevel > 40 && relaxationLevel <= 60) levelName = 'Moderate Relaxation';
+          else if (relaxationLevel > 60 && relaxationLevel <= 75) levelName = 'Light Relaxation';
+          else if (relaxationLevel > 75 && relaxationLevel <= 90) levelName = 'Active Relaxation';
+          else if (relaxationLevel > 90) levelName = 'Energized';
+          
+          toast.info(`Now playing ${levelName} music (${suitableTrack.bpm} BPM)`);
         }
       }
-    }
-  }, [relaxationLevel]);
+    });
+  }, [relaxationLevel, user]);
 
   const getGreeting = () => {
     const hour = new Date().getHours();

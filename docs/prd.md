@@ -6,7 +6,7 @@
 VibeFlow
 
 ### 1.2 Application Description
-A comprehensive, multi-page music streaming application featuring an adaptive focus engine that dynamically adjusts music recommendations based on user focus levels. The app provides personalized music experiences across three focus zones (Deep Work, Flow State, and Relaxation) while offering advanced features comparable to Spotify, including social sharing, collaborative playlists, podcast support, and enhanced discovery tools.
+A comprehensive, multi-page music streaming application featuring an adaptive focus engine that dynamically adjusts music recommendations based on user focus levels. The app provides personalized music experiences across multiple focus zones while offering advanced features comparable to Spotify, including social sharing, collaborative playlists, podcast support, and enhanced discovery tools.
 
 ## 2. Application Features
 
@@ -14,9 +14,9 @@ A comprehensive, multi-page music streaming application featuring an adaptive fo
 Implement a 5-Tab Bottom Navigation Bar with the following sections:
 
 **Home Tab**
-- Display Adaptive Engine slider (Relaxation Level Bar) at the top for focus score adjustment (0-100)
-- The app dynamically changes playlists and songs being played based on the relaxation level set by the user on this bar
-- When user adjusts the relaxation level bar, automatically switch to appropriate playlist and begin playback based on the current focus zone
+- Display Adaptive Engine slider (Relaxation Level Bar) at the top for focus score adjustment (0-100) with granular control supporting increments of 1
+- The app dynamically changes playlists and songs being played based on the relaxation level set by the user on this bar with instant response and zero delay
+- When user adjusts the relaxation level bar, immediately and automatically switch to appropriate playlist and begin playback based on the current focus zone without any buffering or delay
 - Show Recently Played section with horizontal scrolling
 - Display Current Focus Mode status indicator
 - Show personalized recommendations based on listening history
@@ -73,28 +73,49 @@ Implement a 5-Tab Bottom Navigation Bar with the following sections:
 - Follow/Unfollow functionality
 
 ### 2.2 Adaptive Engine Core Logic
-Manage global state FocusScore (Integer, 0-100) with three focus zones:
+Manage global state FocusScore (Integer, 0-100) with enhanced granular focus zones:
 
-**Deep Work Mode (81-100)**
-- Filter tracks: is_instrumental = true AND BPM > 120
+**Ultra Deep Work Mode (91-100)**
+- Filter tracks: is_instrumental = true AND BPM > 130
 - Apply black and purple color theme
 - Hide social features
 - Auto-queue similar high-focus tracks
-- Automatically switch to Deep Work playlists and begin playback when relaxation level is set in this range
+- Instantly switch to Ultra Deep Work playlists and begin playback with zero delay when relaxation level is set in this range
 
-**Flow State Mode (41-80)**
-- Filter tracks: BPM 90-120
+**Deep Work Mode (76-90)**
+- Filter tracks: is_instrumental = true AND BPM 120-130
+- Apply black and purple color theme
+- Hide social features
+- Auto-queue similar high-focus tracks
+- Instantly switch to Deep Work playlists and begin playback with zero delay when relaxation level is set in this range
+
+**High Flow State Mode (61-75)**
+- Filter tracks: BPM 110-120
 - Include genres: Ambient, Lo-Fi, Minimal Techno
 - Apply black and purple color theme
 - Blend instrumental and vocal tracks
-- Automatically switch to Flow State playlists and begin playback when relaxation level is set in this range
+- Instantly switch to High Flow State playlists and begin playback with zero delay when relaxation level is set in this range
 
-**Relaxation Mode (0-40)**
-- Filter tracks: BPM < 90
+**Flow State Mode (41-60)**
+- Filter tracks: BPM 90-110
+- Include genres: Ambient, Lo-Fi, Minimal Techno
+- Apply black and purple color theme
+- Blend instrumental and vocal tracks
+- Instantly switch to Flow State playlists and begin playback with zero delay when relaxation level is set in this range
+
+**Light Relaxation Mode (21-40)**
+- Filter tracks: BPM 70-90
 - Include genres: Acoustic, Jazz, Vocal-heavy tracks
 - Apply black and purple color theme
 - Include podcast recommendations
-- Automatically switch to Relaxation playlists and begin playback when relaxation level is set in this range
+- Instantly switch to Light Relaxation playlists and begin playback with zero delay when relaxation level is set in this range
+
+**Deep Relaxation Mode (0-20)**
+- Filter tracks: BPM < 70
+- Include genres: Acoustic, Classical, Ambient, Vocal-heavy tracks
+- Apply black and purple color theme
+- Include podcast recommendations
+- Instantly switch to Deep Relaxation playlists and begin playback with zero delay when relaxation level is set in this range
 
 ### 2.3 Smart Player
 - Persistent Now Playing bar at bottom of screen
@@ -112,6 +133,7 @@ Manage global state FocusScore (Integer, 0-100) with three focus zones:
 - Add to playlist quick action
 - Artist and album quick navigation
 - Support playback of audio files in various formats
+- Instant playlist switching capability with zero buffering when relaxation level changes
 
 ### 2.4 Library Management
 - Heart icon on every track for liking
@@ -176,12 +198,13 @@ Manage global state FocusScore (Integer, 0-100) with three focus zones:
 - Glassmorphism (frosted glass effects) for player background and overlays
 - Neumorphic buttons (soft shadows) for player controls
 - Bold, sans-serif headers with wide letter spacing
-- Smooth cross-fade transitions (300ms) when switching between Focus Zones
+- Instant cross-fade transitions (0ms delay) when switching between Focus Zones
 - Skeleton loading states for content
 - Pull-to-refresh functionality
 - Infinite scroll for content lists
 - Responsive grid layouts
 - Use realistic, non-AI-generated style album covers for all playlists and tracks
+- Relaxation Level Bar supports granular adjustment with increments of 1 (0-100 scale)
 
 ## 3. Data Structure
 
@@ -232,6 +255,7 @@ Manage global state FocusScore (Integer, 0-100) with three focus zones:
 - followers: Array of user IDs following the playlist
 - created_at: Creation timestamp
 - updated_at: Last update timestamp
+- focus_zone: String indicating which focus zone the playlist belongs to (Ultra Deep Work, Deep Work, High Flow State, Flow State, Light Relaxation, Deep Relaxation)
 
 ### 3.4 Artists Collection
 - id: Artist unique identifier
@@ -272,7 +296,7 @@ Manage global state FocusScore (Integer, 0-100) with three focus zones:
 
 ### 3.8 Pre-populated Relaxation Playlists
 
-**Playlist 1: Peaceful Evening**
+**Playlist 1: Peaceful Evening (Deep Relaxation Mode: 0-20)**
 - Track 1: Moonlight Sonata - Ludwig van Beethoven
 - Track 2: Clair de Lune - Claude Debussy
 - Track 3: Gymnopédie No.1 - Erik Satie
@@ -284,7 +308,7 @@ Manage global state FocusScore (Integer, 0-100) with three focus zones:
 - Track 9: Spiegel im Spiegel - Arvo Pärt
 - Track 10: Comptine d'un autre été - Yann Tiersen
 
-**Playlist 2: Ocean Waves**
+**Playlist 2: Ocean Waves (Deep Relaxation Mode: 0-20)**
 - Track 1: Weightless - Marconi Union
 - Track 2: Electra - Airstream
 - Track 3: Mellomaniac - DJ Shah
@@ -296,7 +320,7 @@ Manage global state FocusScore (Integer, 0-100) with three focus zones:
 - Track 9: Canzonetta Sull'aria - Mozart
 - Track 10: We Can Fly - Rue du Soleil
 
-**Playlist 3: Zen Garden**
+**Playlist 3: Zen Garden (Light Relaxation Mode: 21-40)**
 - Track 1: Sakura - Traditional Japanese
 - Track 2: River Flows in You - Yiruma
 - Track 3: A Thousand Years - Christina Perri
@@ -308,7 +332,7 @@ Manage global state FocusScore (Integer, 0-100) with three focus zones:
 - Track 9: To Build a Home - The Cinematic Orchestra
 - Track 10: Experience - Ludovico Einaudi
 
-**Playlist 4: Starry Night**
+**Playlist 4: Starry Night (Light Relaxation Mode: 21-40)**
 - Track 1: Nuvole Bianche - Ludovico Einaudi
 - Track 2: Una Mattina - Ludovico Einaudi
 - Track 3: Divenire - Ludovico Einaudi
@@ -320,7 +344,7 @@ Manage global state FocusScore (Integer, 0-100) with three focus zones:
 - Track 9: Discovery at Night - Ludovico Einaudi
 - Track 10: Oltremare - Ludovico Einaudi
 
-**Playlist 5: Rainy Day Comfort**
+**Playlist 5: Rainy Day Comfort (Light Relaxation Mode: 21-40)**
 - Track 1: Kiss the Rain - Yiruma
 - Track 2: May Be - Yiruma
 - Track 3: Love Me - Yiruma
@@ -332,7 +356,7 @@ Manage global state FocusScore (Integer, 0-100) with three focus zones:
 - Track 9: Wait There - Yiruma
 - Track 10: On the Way - Yiruma
 
-**Playlist 16: Tranquil Waters**
+**Playlist 16: Tranquil Waters (Deep Relaxation Mode: 0-20)**
 - Track 1: Aquarium - Camille Saint-Saëns
 - Track 2: The Swan - Camille Saint-Saëns
 - Track 3: Morning Mood - Edvard Grieg
@@ -344,7 +368,7 @@ Manage global state FocusScore (Integer, 0-100) with three focus zones:
 - Track 9: Reverie - Claude Debussy
 - Track 10: Arabesque No. 1 - Claude Debussy
 
-**Playlist 17: Sunset Serenity**
+**Playlist 17: Sunset Serenity (Light Relaxation Mode: 21-40)**
 - Track 1: Somewhere Over the Rainbow - Israel Kamakawiwoʻole
 - Track 2: What a Wonderful World - Louis Armstrong
 - Track 3: Moon River - Audrey Hepburn
@@ -356,7 +380,7 @@ Manage global state FocusScore (Integer, 0-100) with three focus zones:
 - Track 9: Dream a Little Dream of Me - Ella Fitzgerald
 - Track 10: Cheek to Cheek - Ella Fitzgerald & Louis Armstrong
 
-**Playlist 18: Gentle Breeze**
+**Playlist 18: Gentle Breeze (Light Relaxation Mode: 21-40)**
 - Track 1: Comptine d'un autre été: L'après-midi - Yann Tiersen
 - Track 2: La Valse d'Amélie - Yann Tiersen
 - Track 3: Sur le fil - Yann Tiersen
@@ -368,7 +392,7 @@ Manage global state FocusScore (Integer, 0-100) with three focus zones:
 - Track 9: Rue des Cascades - Yann Tiersen
 - Track 10: Le Banquet - Yann Tiersen
 
-**Playlist 19: Meditation Garden**
+**Playlist 19: Meditation Garden (Deep Relaxation Mode: 0-20)**
 - Track 1: Weightless Part 2 - Marconi Union
 - Track 2: Watermark - Enya
 - Track 3: Only Time - Enya
@@ -380,7 +404,7 @@ Manage global state FocusScore (Integer, 0-100) with three focus zones:
 - Track 9: Shepherd Moons - Enya
 - Track 10: Book of Days - Enya
 
-**Playlist 20: Soft Piano Dreams**
+**Playlist 20: Soft Piano Dreams (Light Relaxation Mode: 21-40)**
 - Track 1: Comptine d'un autre été - Yann Tiersen
 - Track 2: River Flows in You - Yiruma
 - Track 3: Nuvole Bianche - Ludovico Einaudi
@@ -394,7 +418,7 @@ Manage global state FocusScore (Integer, 0-100) with three focus zones:
 
 ### 3.9 Pre-populated Deep Work Playlists
 
-**Playlist 6: Focus Flow**
+**Playlist 6: Focus Flow (Deep Work Mode: 76-90)**
 - Track 1: Strobe - Deadmau5
 - Track 2: Opus - Eric Prydz
 - Track 3: Midnight City - M83
@@ -406,7 +430,7 @@ Manage global state FocusScore (Integer, 0-100) with three focus zones:
 - Track 9: Porcelain - Moby
 - Track 10: Right Here Right Now - Fatboy Slim
 
-**Playlist 7: Deep Concentration**
+**Playlist 7: Deep Concentration (Ultra Deep Work Mode: 91-100)**
 - Track 1: Resonance - HOME
 - Track 2: A Real Hero - College & Electric Youth
 - Track 3: Nightcall - Kavinsky
@@ -418,7 +442,7 @@ Manage global state FocusScore (Integer, 0-100) with three focus zones:
 - Track 9: Miami Nights - Timecop1983
 - Track 10: On the Run - Timecop1983
 
-**Playlist 8: Productivity Boost**
+**Playlist 8: Productivity Boost (Deep Work Mode: 76-90)**
 - Track 1: Sandstorm - Darude
 - Track 2: Levels - Avicii
 - Track 3: Animals - Martin Garrix
@@ -432,7 +456,7 @@ Manage global state FocusScore (Integer, 0-100) with three focus zones:
 
 ### 3.10 Pre-populated Flow State Playlists
 
-**Playlist 9: Ambient Dreams**
+**Playlist 9: Ambient Dreams (Flow State Mode: 41-60)**
 - Track 1: An Ending (Ascent) - Brian Eno
 - Track 2: Music for Airports - Brian Eno
 - Track 3: Avril 14th - Aphex Twin
@@ -444,7 +468,7 @@ Manage global state FocusScore (Integer, 0-100) with three focus zones:
 - Track 9: Green Calx - Aphex Twin
 - Track 10: Blue Calx - Aphex Twin
 
-**Playlist 10: Lo-Fi Study**
+**Playlist 10: Lo-Fi Study (High Flow State Mode: 61-75)**
 - Track 1: Shiloh - Shiloh Dynasty
 - Track 2: I Know You So Well - Shiloh Dynasty
 - Track 3: Losing Interest - Shiloh Dynasty
@@ -458,7 +482,7 @@ Manage global state FocusScore (Integer, 0-100) with three focus zones:
 
 ### 3.11 Pre-populated Mixed Genre Playlists
 
-**Playlist 11: Global Hits**
+**Playlist 11: Global Hits (High Flow State Mode: 61-75)**
 - Track 1: Despacito - Luis Fonsi ft. Daddy Yankee
 - Track 2: Gangnam Style - PSY
 - Track 3: Shape of You - Ed Sheeran
@@ -470,7 +494,7 @@ Manage global state FocusScore (Integer, 0-100) with three focus zones:
 - Track 9: Bad Guy - Billie Eilish
 - Track 10: Señorita - Shawn Mendes & Camila Cabello
 
-**Playlist 12: Rock Classics**
+**Playlist 12: Rock Classics (Deep Work Mode: 76-90)**
 - Track 1: Bohemian Rhapsody - Queen
 - Track 2: Stairway to Heaven - Led Zeppelin
 - Track 3: Hotel California - Eagles
@@ -482,7 +506,7 @@ Manage global state FocusScore (Integer, 0-100) with three focus zones:
 - Track 9: Black Hole Sun - Soundgarden
 - Track 10: Come As You Are - Nirvana
 
-**Playlist 13: Hip-Hop Essentials**
+**Playlist 13: Hip-Hop Essentials (High Flow State Mode: 61-75)**
 - Track 1: Lose Yourself - Eminem
 - Track 2: In Da Club - 50 Cent
 - Track 3: Juicy - The Notorious B.I.G.
@@ -494,7 +518,7 @@ Manage global state FocusScore (Integer, 0-100) with three focus zones:
 - Track 9: Changes - 2Pac
 - Track 10: The Real Slim Shady - Eminem
 
-**Playlist 14: Jazz Lounge**
+**Playlist 14: Jazz Lounge (Flow State Mode: 41-60)**
 - Track 1: Take Five - Dave Brubeck
 - Track 2: So What - Miles Davis
 - Track 3: My Favorite Things - John Coltrane
@@ -506,7 +530,7 @@ Manage global state FocusScore (Integer, 0-100) with three focus zones:
 - Track 9: Fly Me to the Moon - Frank Sinatra
 - Track 10: The Girl from Ipanema - Stan Getz & João Gilberto
 
-**Playlist 15: Country Roads**
+**Playlist 15: Country Roads (Flow State Mode: 41-60)**
 - Track 1: Take Me Home, Country Roads - John Denver
 - Track 2: Jolene - Dolly Parton
 - Track 3: Ring of Fire - Johnny Cash
