@@ -20,22 +20,22 @@
 - [x] Step 17: Add Relaxation Music to HomePage & Enhance Search (Completed)
 - [x] Step 18: Enhanced Player Controls & Sessions Page (Completed)
 - [x] Step 19: Adaptive Relaxation System with Like Functionality (Completed)
-  - [x] Created RelaxationMeter component with slider (0-100)
-  - [x] Added adaptive playlist/track filtering based on relaxation level
-  - [x] Created user_liked_playlists database table
-  - [x] Added like button to all playlists
-  - [x] Implemented playlist like/unlike functionality
-  - [x] Added API functions for playlist likes
-  - [x] Tracks already have like buttons (verified)
+- [x] Step 20: Auto-Play & Full Playlist Management (Completed)
+  - [x] Added auto-play when relaxation level changes
+  - [x] Created PlaylistDetailPage with full track display
+  - [x] Added playlist editing and deletion
+  - [x] Connected LibraryPage to playlist details
+  - [x] Enabled playlist creation from Library
+  - [x] Made playlists fully functional with playback
 
 ## Notes
-- RelaxationMeter displays in right sidebar with visual feedback ✓
-- Three relaxation zones: Deep (0-30), Moderate (31-60), Light (61-100) ✓
-- App adapts music based on relaxation level:
-  - Deep: BPM 0-60, Ambient & Classical genres
-  - Moderate: BPM 50-80, Acoustic, Jazz, Classical, Ambient
-  - Light: BPM 70-100, Acoustic, Jazz, Lo-Fi ✓
-- Playlist like buttons always visible with backdrop blur ✓
-- Like state persists in database ✓
-- Toast notifications for like/unlike actions ✓
-- All songs have like buttons (already implemented) ✓
+- Auto-play switches tracks when relaxation level changes significantly ✓
+- PlaylistDetailPage shows all tracks in a playlist ✓
+- Users can edit playlist title and description ✓
+- Users can delete their own playlists ✓
+- LibraryPage links to playlist detail pages ✓
+- CreatePlaylistDialog integrated in Library ✓
+- Playlists display cover images or gradient placeholders ✓
+- Play All button plays entire playlist ✓
+- Individual tracks in playlists are playable ✓
+- Toast notifications for user feedback ✓

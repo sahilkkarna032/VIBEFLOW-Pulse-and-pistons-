@@ -5,6 +5,7 @@ import FocusLabPage from './pages/FocusLabPage';
 import ProfilePage from './pages/ProfilePage';
 import LoginPage from './pages/LoginPage';
 import SessionsPage from './pages/SessionsPage';
+import PlaylistDetailPage from './pages/PlaylistDetailPage';
 import TransformCoversPage from './pages/TransformCoversPage';
 import NotFound from './pages/NotFound';
 import type { ReactNode } from 'react';
@@ -46,6 +47,12 @@ const routes: RouteConfig[] = [
     name: 'Sessions',
     path: '/sessions',
     element: <SessionsPage />,
+    visible: false,
+  },
+  {
+    name: 'Playlist Detail',
+    path: '/playlist/:id',
+    element: <PlaylistDetailPage />,
     visible: false,
   },
   {

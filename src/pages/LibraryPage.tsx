@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { getLikedTracks, getUserPlaylists } from '@/db/api';
 import { Heart, Download, User, Plus } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { CreatePlaylistDialog } from '@/components/CreatePlaylistDialog';
 import type { Track, Playlist } from '@/types';
 import { useNavigate } from 'react-router-dom';
 
@@ -15,19 +16,31 @@ export default function LibraryPage() {
   const [likedTracks, setLikedTracks] = useState<Track[]>([]);
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [loading, setLoading] = useState(true);
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
 
   useEffect(() => {
     if (user) {
-      Promise.all([
-        getLikedTracks(user.id),
-        getUserPlaylists(user.id),
-      ]).then(([liked, userPlaylists]) => {
-        setLikedTracks(liked);
-        setPlaylists(userPlaylists);
-        setLoading(false);
-      });
+      loadData();
     }
   }, [user]);
+
+  const loadData = () => {
+    if (!user) return;
+    
+    Promise.all([
+      getLikedTracks(user.id),
+      getUserPlaylists(user.id),
+    ]).then(([liked, userPlaylists]) => {
+      setLikedTracks(liked);
+      setPlaylists(userPlaylists);
+      setLoading(false);
+    });
+  };
+
+  const handlePlaylistCreated = () => {
+    setCreateDialogOpen(false);
+    loadData(); // Reload playlists
+  };
 
   if (!user) {
     return (
@@ -128,7 +141,7 @@ export default function LibraryPage() {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-bold">My Playlists</h2>
-          <Button size="sm" variant="outline" onClick={() => {}}>
+          <Button size="sm" variant="outline" onClick={() => setCreateDialogOpen(true)}>
             <Plus className="w-4 h-4 mr-2" />
             Create Playlist
           </Button>
@@ -137,9 +150,28 @@ export default function LibraryPage() {
         {playlists.length > 0 ? (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {playlists.map((playlist) => (
-              <Card key={playlist.id} className="p-4 cursor-pointer hover:border-primary/50 focus-transition">
-                <h3 className="font-bold truncate">{playlist.title}</h3>
-                <p className="text-sm text-muted-foreground">{playlist.track_ids.length} tracks</p>
+              <Card
+                key={playlist.id}
+                className="group cursor-pointer hover:border-primary/50 focus-transition overflow-hidden"
+                onClick={() => navigate(`/playlist/${playlist.id}`)}
+              >
+                {playlist.cover_url ? (
+                  <div className="aspect-square relative">
+                    <img
+                      src={playlist.cover_url}
+                      alt={playlist.title}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                ) : (
+                  <div className="aspect-square bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
+                    <Plus className="w-12 h-12 text-muted-foreground" />
+                  </div>
+                )}
+                <div className="p-4">
+                  <h3 className="font-bold truncate">{playlist.title}</h3>
+                  <p className="text-sm text-muted-foreground">{playlist.track_ids.length} tracks</p>
+                </div>
               </Card>
             ))}
           </div>
@@ -147,10 +179,21 @@ export default function LibraryPage() {
           <Card className="p-12 text-center">
             <Plus className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
             <h3 className="text-xl font-bold mb-2">No playlists yet</h3>
-            <p className="text-muted-foreground">Create your first playlist to organize your music</p>
+            <p className="text-muted-foreground mb-4">Create your first playlist to organize your music</p>
+            <Button onClick={() => setCreateDialogOpen(true)}>
+              <Plus className="w-4 h-4 mr-2" />
+              Create Playlist
+            </Button>
           </Card>
         )}
       </div>
+
+      {/* Create Playlist Dialog */}
+      <CreatePlaylistDialog
+        open={createDialogOpen}
+        onOpenChange={setCreateDialogOpen}
+        onSuccess={handlePlaylistCreated}
+      />
     </div>
   );
 }

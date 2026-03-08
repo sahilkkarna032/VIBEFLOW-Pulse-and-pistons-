@@ -16,7 +16,7 @@ import { cn } from '@/lib/utils';
 import type { Track, Playlist } from '@/types';
 
 export default function HomePage() {
-  const { focusMode, focusScore, setFocusScore } = usePlayer();
+  const { focusMode, focusScore, setFocusScore, currentTrack, isPlaying, playTrack } = usePlayer();
   const { user } = useAuth();
   const [recentTracks, setRecentTracks] = useState<Track[]>([]);
   const [relaxationTracks, setRelaxationTracks] = useState<Track[]>([]);
@@ -66,7 +66,8 @@ export default function HomePage() {
       getTracksByFilter(bpmMin, bpmMax, genres),
       getCuratedPlaylists(),
     ]).then(([tracks, allPlaylists]) => {
-      setRelaxationTracks(tracks.slice(0, 16));
+      const filteredTracks = tracks.slice(0, 16);
+      setRelaxationTracks(filteredTracks);
       
       // Filter for relaxation playlists
       const relaxPlaylists = allPlaylists.filter(p => 
@@ -97,6 +98,38 @@ export default function HomePage() {
       }
     });
   }, [relaxationLevel, user]);
+
+  // Auto-play when relaxation level changes significantly
+  useEffect(() => {
+    // Only auto-play if there are tracks and user has interacted with the slider
+    if (relaxationTracks.length > 0 && currentTrack) {
+      // Check if current track BPM matches the new relaxation level
+      const currentBpm = currentTrack.bpm;
+      let shouldChange = false;
+
+      if (relaxationLevel <= 30 && currentBpm > 60) {
+        shouldChange = true;
+      } else if (relaxationLevel > 30 && relaxationLevel <= 60 && (currentBpm < 50 || currentBpm > 80)) {
+        shouldChange = true;
+      } else if (relaxationLevel > 60 && (currentBpm < 70 || currentBpm > 100)) {
+        shouldChange = true;
+      }
+
+      if (shouldChange && isPlaying) {
+        // Auto-switch to appropriate track
+        const suitableTrack = relaxationTracks.find(track => {
+          if (relaxationLevel <= 30) return track.bpm <= 60;
+          if (relaxationLevel <= 60) return track.bpm >= 50 && track.bpm <= 80;
+          return track.bpm >= 70 && track.bpm <= 100;
+        });
+
+        if (suitableTrack) {
+          playTrack(suitableTrack, relaxationTracks);
+          toast.info(`Switched to ${relaxationLevel <= 30 ? 'Deep' : relaxationLevel <= 60 ? 'Moderate' : 'Light'} Relaxation music`);
+        }
+      }
+    }
+  }, [relaxationLevel]);
 
   const getGreeting = () => {
     const hour = new Date().getHours();

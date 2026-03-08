@@ -15,7 +15,8 @@ Implement a 5-Tab Bottom Navigation Bar with the following sections:
 
 **Home Tab**
 - Display Adaptive Engine slider (Relaxation Level Bar) at the top for focus score adjustment (0-100)
-- The app dynamically changes playlists based on the relaxation level set by the user on this bar
+- The app dynamically changes playlists and songs being played based on the relaxation level set by the user on this bar
+- When user adjusts the relaxation level bar, automatically switch to appropriate playlist and begin playback based on the current focus zone
 - Show Recently Played section with horizontal scrolling
 - Display Current Focus Mode status indicator
 - Show personalized recommendations based on listening history
@@ -47,12 +48,14 @@ Implement a 5-Tab Bottom Navigation Bar with the following sections:
   - Liked Playlists
   - Downloaded Albums
   - Custom Focus Profiles
-  - Your Playlists
+  - Your Playlists (user-created playlists with full playback functionality)
   - Your Podcasts
   - Your Artists (followed artists)
   - Your Albums
 - Filter and sort options (Recently Added, Alphabetical, Artist)
 - Create Your Own Playlist button at the top of the playlist section with functional playlist creation capability
+- Each user-created playlist contains a list of songs that can be played
+- Users can click on any playlist to view its songs and play them
 
 **Focus Lab Tab**
 - Statistics page with interactive graph visualization
@@ -77,18 +80,21 @@ Manage global state FocusScore (Integer, 0-100) with three focus zones:
 - Apply black and purple color theme
 - Hide social features
 - Auto-queue similar high-focus tracks
+- Automatically switch to Deep Work playlists and begin playback when relaxation level is set in this range
 
 **Flow State Mode (41-80)**
 - Filter tracks: BPM 90-120
 - Include genres: Ambient, Lo-Fi, Minimal Techno
 - Apply black and purple color theme
 - Blend instrumental and vocal tracks
+- Automatically switch to Flow State playlists and begin playback when relaxation level is set in this range
 
 **Relaxation Mode (0-40)**
 - Filter tracks: BPM < 90
 - Include genres: Acoustic, Jazz, Vocal-heavy tracks
 - Apply black and purple color theme
 - Include podcast recommendations
+- Automatically switch to Relaxation playlists and begin playback when relaxation level is set in this range
 
 ### 2.3 Smart Player
 - Persistent Now Playing bar at bottom of screen
@@ -114,6 +120,8 @@ Manage global state FocusScore (Integer, 0-100) with three focus zones:
 - Real-time addition of playlist_id to user Liked Playlists list upon clicking
 - Create, edit, and delete custom playlists
 - Add tracks to multiple playlists
+- User-created playlists support adding songs from the app library
+- User-created playlists are fully functional and can play all added songs
 - Playlist cover customization
 - Playlist description editing
 - Download tracks/albums/playlists for offline listening
